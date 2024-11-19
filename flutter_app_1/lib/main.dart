@@ -2,12 +2,9 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 void main() {
-  runApp(MyApp());  // tutorial version
-  // runApp(const MyApp());  // template version
+  runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -30,7 +27,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
   var favorites = <WordPair>[];
@@ -51,7 +47,6 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-
 class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -62,62 +57,59 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget page;
     switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
     return LayoutBuilder(
-      // `builder` called whenever constraints change
-      builder: (context, constraints) {
-        return Scaffold(
-          body: Row(
-            children: [
-              SafeArea(
-                child: NavigationRail(
-                  // responsive trigger
-                  extended: constraints.maxWidth >= 600,
-                  destinations: [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home),
-                      label: Text('Home'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.favorite),
-                      label: Text('Like'),
-                    ),
-                  ],
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: (value) {
-                    print('selected: $value');
-                    setState(() {
-                      selectedIndex = value;
-                    });
-                  },
-                ),
+        // `builder` called whenever constraints change
+        builder: (context, constraints) {
+      return Scaffold(
+        body: Row(
+          children: [
+            SafeArea(
+              child: NavigationRail(
+                // responsive trigger
+                extended: constraints.maxWidth >= 600,
+                destinations: [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home),
+                    label: Text('Home'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.favorite),
+                    label: Text('Like'),
+                  ),
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  print('selected: $value');
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
               ),
-              Expanded(
-                child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page,
-                ),
+            ),
+            Expanded(
+              child: Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: page,
               ),
-            ],
-          ),
-        );
-      }
-    );
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
-
 
 class GeneratorPage extends StatelessWidget {
   @override
@@ -139,9 +131,10 @@ class GeneratorPage extends StatelessWidget {
         children: [
           Text('Your dog\'s superspy codename is:'),
           BigCard(pair: pair),
-          SizedBox(height: 10),  // spacer
+          SizedBox(height: 10), // spacer
           Row(
-            mainAxisSize: MainAxisSize.min,  // for learning. mainAxisAlignment w/b better.
+            mainAxisSize:
+                MainAxisSize.min, // for learning. mainAxisAlignment w/b better.
             children: [
               ElevatedButton.icon(
                 onPressed: () {
@@ -158,7 +151,7 @@ class GeneratorPage extends StatelessWidget {
               //   },
               //   child: Text('<3 Favorite'),  // make inline ternary to switch between </3 and <3 ?
               // ),
-              SizedBox(width: 10),  // spacer
+              SizedBox(width: 10), // spacer
               ElevatedButton(
                 onPressed: () {
                   print('Next button pressed!');
@@ -170,12 +163,9 @@ class GeneratorPage extends StatelessWidget {
           ),
         ],
       ),
-
     );
-
   }
 }
-
 
 class BigCard extends StatelessWidget {
   const BigCard({
@@ -202,5 +192,26 @@ class BigCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var favorites = appState.favorites;
+
+    return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: favorites.length,
+        itemBuilder: (BuildContext context, int index) {
+
+        return Container(
+          height: 50,
+          child: Center(child: Text('Entry ${favorites[index]}')),
+          );
+        }
+      );
   }
 }
