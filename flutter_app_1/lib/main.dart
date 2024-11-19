@@ -41,7 +41,7 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleFavorite() {
+  void toggleLike() {
     if (favorites.contains(current)) {
       favorites.remove(current);
     } else {
@@ -69,7 +69,7 @@ class MyHomePage extends StatelessWidget {
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.favorite),
-                  label: Text('Favorites'),
+                  label: Text('Like'),
                 ),
               ],
               selectedIndex: 0,
@@ -96,7 +96,7 @@ class GeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
-    // var favorited = appState.favorites.contains(pair);
+    // var liked = appState.favorites.contains(pair);
     IconData icon;
 
     if (appState.favorites.contains(pair)) {
@@ -117,11 +117,11 @@ class GeneratorPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  print('Favorite (icon) button pressed!');
-                  appState.toggleFavorite();
+                  print('Like button pressed!');
+                  appState.toggleLike();
                 },
                 icon: Icon(icon),
-                label: Text('Favorite'),
+                label: Text('Like'),
               ),
               // ElevatedButton(
               //   onPressed: () {
