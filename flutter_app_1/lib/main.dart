@@ -2,10 +2,12 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 void main() {
   runApp(MyApp());  // tutorial version
   // runApp(const MyApp());  // template version
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -28,15 +30,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
+  var favorites = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
     // ChangeNotifier.notifyListeners() alerts MyAppState watchers of changes
     notifyListeners();
   }
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
+
 
 class MyHomePage extends StatelessWidget {
   @override
@@ -51,7 +65,7 @@ class MyHomePage extends StatelessWidget {
           children: [
             Text('Your dog\'s superspy codename is:'),
             BigCard(pair: pair),
-            SizedBox(height: 10),
+            SizedBox(height: 10),  // spacer
             ElevatedButton(
               onPressed: () {
                 print('button pressed!');
@@ -66,12 +80,12 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
     required this.pair,
   });
-
   final WordPair pair;
 
   @override
