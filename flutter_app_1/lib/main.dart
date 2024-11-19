@@ -66,12 +66,24 @@ class MyHomePage extends StatelessWidget {
             Text('Your dog\'s superspy codename is:'),
             BigCard(pair: pair),
             SizedBox(height: 10),  // spacer
-            ElevatedButton(
-              onPressed: () {
-                print('button pressed!');
-                appState.getNext();
-              },
-              child: Text('Next'),
+            Row(
+              mainAxisSize: MainAxisSize.min,  // for learning. mainAxisAlignment w/b better.
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    print('button pressed!');
+                    appState.toggleFavorite();
+                  },
+                  child: Text('Favorite'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    print('button pressed!');
+                    appState.getNext();
+                  },
+                  child: Text('Next'),
+                ),
+              ],
             ),
           ],
         ),
