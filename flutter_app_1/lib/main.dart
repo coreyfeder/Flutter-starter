@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SafeArea(
               child: NavigationRail(
                 // responsive trigger
-                extended: constraints.maxWidth >= 600,
+                extended: constraints.maxWidth >= 500,
                 destinations: [
                   NavigationRailDestination(
                     icon: Icon(Icons.home),
@@ -202,16 +202,44 @@ class FavoritesPage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var favorites = appState.favorites;
 
-    return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: favorites.length,
-        itemBuilder: (BuildContext context, int index) {
-
-        return Container(
-          height: 50,
-          child: Center(child: Text('Entry ${favorites[index]}')),
-          );
-        }
+    if (favorites.isEmpty) {
+      return Center(
+        child: Text('No favorites yet.'),
       );
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have ${favorites.length} favorites:'),
+        ),
+        for (var pair in favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          ),
+      ],
+    );
+
+    // return Column(
+    //   children: [
+    //     favorites.map((m) => Text(m))
+    //     favorites,
+    //   ],
+    // );
+
+    // return ListView.builder(
+    //   padding: const EdgeInsets.all(8),
+    //   itemCount: favorites.length,
+    //   itemBuilder: (BuildContext context, int index) {
+    //   },
+    // );
+
+    // return Container(
+    //   height: 50,
+    //   child: Center(child: Text('Entry ${favorites[index]}')),
+    //   );
+    // }
   }
 }
