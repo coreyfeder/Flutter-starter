@@ -53,6 +53,11 @@ class MyAppState extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void removeLike(WordPair pair) {
+    likedWords.remove(pair);
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatefulWidget {
@@ -152,13 +157,6 @@ class GeneratorPage extends StatelessWidget {
                 icon: Icon(icon),
                 label: Text('Like'),
               ),
-              // ElevatedButton(
-              //   onPressed: () {
-              //     print('Favorite (text) button pressed!');
-              //     appState.toggleFavorite();
-              //   },
-              //   child: Text('<3 Favorite'),  // make inline ternary to switch between </3 and <3 ?
-              // ),
               SizedBox(width: 10), // spacer
               ElevatedButton(
                 onPressed: () {
@@ -207,11 +205,10 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var favorites = appState.likedWords;
 
-    if (favorites.isEmpty) {
+    if (appState.likedWords.isEmpty) {
       return Center(
-        child: Text('No favorites yet.'),
+        child: Text('No names Liked yet.'),
       );
     }
 
@@ -219,9 +216,9 @@ class FavoritesPage extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('You have ${favorites.length} favorites:'),
+          child: Text('You have ${appState.likedWords.length} Liked names:'),
         ),
-        for (var pair in favorites)
+        for (var pair in appState.likedWords)
           ListTile(
             leading: Icon(Icons.favorite),
             title: Text(pair.asLowerCase),
