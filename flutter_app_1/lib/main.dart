@@ -30,18 +30,26 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
   var likedWords = <WordPair>[];
+  var history = <WordPair>[]; // create a scrollback of all generated wordpairs
+
+  // GlobalKey is very expensive if mishandled.
+  // "a good practice is to let a State object own the GlobalKey, and
+  // instantiate it outside the build method, such as in [State.initState]"
+  GlobalKey? historyListKey;
 
   void getNext() {
+    history.insert(0, current); // ??: is adding to front more expensive?
     current = WordPair.random();
-    // ChangeNotifier.notifyListeners() alerts MyAppState watchers of changes
+    // alert MyAppState watchers of change
     notifyListeners();
   }
 
-  void toggleLike() {
-    if (likedWords.contains(current)) {
-      likedWords.remove(current);
+  void toggleLike([WordPair? pair]) {
+    pair = pair ?? current;
+    if (likedWords.contains(pair)) {
+      likedWords.remove(pair);
     } else {
-      likedWords.add(current);
+      likedWords.add(pair);
     }
     notifyListeners();
   }
@@ -53,7 +61,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;  // this is the only state this widget tracks
+  var selectedIndex = 0; // this is the only state this widget tracks
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +202,6 @@ class BigCard extends StatelessWidget {
     );
   }
 }
-
 
 class FavoritesPage extends StatelessWidget {
   @override
