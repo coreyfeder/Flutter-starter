@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-  var favorites = <WordPair>[];
+  var likedWords = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
@@ -38,10 +38,10 @@ class MyAppState extends ChangeNotifier {
   }
 
   void toggleLike() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
+    if (likedWords.contains(current)) {
+      likedWords.remove(current);
     } else {
-      favorites.add(current);
+      likedWords.add(current);
     }
     notifyListeners();
   }
@@ -119,7 +119,7 @@ class GeneratorPage extends StatelessWidget {
     // var liked = appState.favorites.contains(pair);
     IconData icon;
 
-    if (appState.favorites.contains(pair)) {
+    if (appState.likedWords.contains(pair)) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
@@ -200,7 +200,7 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var favorites = appState.favorites;
+    var favorites = appState.likedWords;
 
     if (favorites.isEmpty) {
       return Center(
