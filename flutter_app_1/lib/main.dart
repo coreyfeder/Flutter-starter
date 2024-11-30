@@ -139,7 +139,6 @@ class GeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
-    // var liked = appState.favorites.contains(pair);
     IconData icon;
 
     if (appState.likedWords.contains(pair)) {
@@ -152,6 +151,11 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Expanded(
+            flex: 3,
+            child: HistoryListView(),
+          ),
+          SizedBox(height: 10),
           Text('Your dog\'s superspy codename is:'),
           BigCard(pair: pair),
           SizedBox(height: 10), // spacer
@@ -177,6 +181,7 @@ class GeneratorPage extends StatelessWidget {
               ),
             ],
           ),
+          Spacer(flex: 2),
         ],
       ),
     );
