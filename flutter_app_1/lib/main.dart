@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-  var likedWords = <WordPair>[];
+  var likedWords = <WordPair>[]; // nee favorites
   var history = <WordPair>[]; // create a scrollback of all generated wordpairs
 
   // GlobalKey is very expensive if mishandled.
@@ -70,17 +70,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // maybe reference for brevity? `var theme = Theme.of(context);`, or `var colorScheme = Theme.of(context).colorScheme;`
+
     Widget page;
     switch (selectedIndex) {
       case 0:
         page = GeneratorPage();
         break;
       case 1:
-        page = FavoritesPage();
+        page = LikesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
+
+    var mainArea = ColoredBox(
+      color: Theme.of(context).colorScheme.primaryContainer,
+      child: AnimatedSwitcher(
+        duration: Duration(milliseconds: 150),
+        child: page,
+      ),
+    );
 
     return LayoutBuilder(
         // `builder` called whenever constraints change
@@ -201,7 +211,7 @@ class BigCard extends StatelessWidget {
   }
 }
 
-class FavoritesPage extends StatelessWidget {
+class LikesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -245,5 +255,67 @@ class FavoritesPage extends StatelessWidget {
     //   child: Center(child: Text('Entry ${favorites[index]}')),
     //   );
     // }
+  }
+}
+
+class HistoryListView extends StatefulWidget {
+  const HistoryListView({Key? key}) : super(key: key);
+
+  @override
+  State<HistoryListView> createState() => _HistoryListViewState();
+}
+
+class _HistoryListViewState extends State<HistoryListView> {
+  // Needed so that [MyAppState] can tell [AnimatedList] below to animate
+  // new items.
+  final _key = GlobalKey();
+
+  // Used to "fade out" the history items at the top, to suggest continuation.
+  static const Gradient _maskingGradient = LinearGradient(
+    // gradient from transparent to opaque black...
+    colors: [Colors.transparent, Colors.black],
+    // ...from the top to the middle
+    stops: [0.0, 0.5],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<MyAppState>();
+    appState.historyListKey = _key;
+
+    return ShaderMask(
+      shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
+      // This blend mode takes the opacity of the shader (i.e. our gradient)
+      // and applies it to the destination (i.e. our animated list).
+      blendMode: BlendMode.dstIn,
+      child: AnimatedList(
+        key: _key,
+        reverse: true,
+        padding: EdgeInsets.only(top: 100),
+        initialItemCount: appState.history.length,
+        itemBuilder: (context, index, animation) {
+          final pair = appState.history[index];
+          return SizeTransition(
+            sizeFactor: animation,
+            child: Center(
+              child: TextButton.icon(
+                onPressed: () {
+                  appState.toggleLike(pair);
+                },
+                icon: appState.likedWords.contains(pair)
+                    ? Icon(Icons.favorite, size: 12)
+                    : SizedBox(),
+                label: Text(
+                  pair.asLowerCase,
+                  semanticsLabel: pair.asPascalCase,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
