@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-  var likedWords = <WordPair>[]; // nee favorites
+  var likedWords = <WordPair>[];
   var history = <WordPair>[]; // create a scrollback of all generated wordpairs
 
   // GlobalKey is very expensive if mishandled.
@@ -39,6 +39,8 @@ class MyAppState extends ChangeNotifier {
 
   void getNext() {
     history.insert(0, current); // ??: is adding to front more expensive?
+    var animatedList = historyListKey?.currentState as AnimatedListState?;
+    animatedList?.insertItem(0);
     current = WordPair.random();
     // alert MyAppState watchers of change
     notifyListeners();
@@ -206,10 +208,26 @@ class BigCard extends StatelessWidget {
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
+        child: AnimatedSize(
+          duration: Duration(milliseconds: 150),
+          // Ensure compound word wraps correctly when window is narrow
+          child: MergeSemantics(
+            child: Wrap(
+              children: [
+                Text(
+                  pair.first.toLowerCase(),
+                  style: style.copyWith(
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                Text(
+                  pair.second.toLowerCase(),
+                  style: style.copyWith(fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -223,21 +241,56 @@ class LikesPage extends StatelessWidget {
 
     if (appState.likedWords.isEmpty) {
       return Center(
-        child: Text('No names Liked yet.'),
+        child: Text('None Liked yet.'),
       );
     }
 
-    return ListView(
+    // return ListView(
+    //   children: [
+    //     Padding(
+    //       padding: const EdgeInsets.all(20),
+    //       child: Text('You have ${appState.likedWords.length} Liked names:'),
+    //     ),
+    //     for (var pair in appState.likedWords)
+    //       ListTile(
+    //         leading: Icon(Icons.favorite),
+    //         title: Text(pair.asLowerCase),
+    //       ),
+    //   ],
+    // );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
           child: Text('You have ${appState.likedWords.length} Liked names:'),
         ),
-        for (var pair in appState.likedWords)
-          ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(pair.asLowerCase),
+        Expanded(
+          child: GridView(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 400,
+              childAspectRatio: 400 / 80,
+            ),
+            children: [
+              // appState.likedWords.map((pair) => (
+              for (var pair in appState.likedWords)
+                ListTile(
+                  leading: IconButton(
+                    icon: Icon(Icons.delete_outline, semanticLabel: 'Delete'),
+                    color: Theme.of(context).colorScheme.primary,
+                    onPressed: () {
+                      appState.removeLike(pair);
+                    },
+                  ),
+                  title: Text(
+                    pair.asLowerCase,
+                    semanticsLabel: pair.asPascalCase,
+                  ),
+                ),
+            ],
           ),
+        ),
       ],
     );
 
